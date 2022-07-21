@@ -1,28 +1,30 @@
 package com.tlglearning.wordcount;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.SQLOutput;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 public class Main {
 
   private static final String TEST_FILE_NAME = "hound-of-the-baskervilles.txt";
 
-  public static void main(String[] args) throws URISyntaxException, IOException {
-      URI uri =  Main.class
-          .getClassLoader()
-          .getResource(TEST_FILE_NAME)
-          .toURI();
+  public static void main(String[] args) throws IOException {
+      try(
+          InputStream input = Main.class.getClassLoader().getResourceAsStream(TEST_FILE_NAME);
+          Reader reader  = new InputStreamReader(input);
+          BufferedReader buffer = new BufferedReader(reader)
 
-      Path path = Paths.get(uri);
-      String text = Files.readString(path);
-      WordCounter counter = new WordCounter(text);
+      ) {
+          WordCounter counter = new WordCounter();
+          String line;
+          while ((line = buffer.readLine()) != null ){
+            counter.add(line);
 
-      System.out.println(counter);
+          }
+          System.out.println(counter);
+      }
   }
 
 }

@@ -7,23 +7,35 @@ import java.util.Set;
 
 public final class WordCounter {
 
-  private final Map<String, Integer> counts;
+  private final Map<String, Integer> counts = new HashMap<>();
+  private int totalWords;
 
-  public WordCounter(String text) {
-    String[] words = splitWords(text);
-    counts = Collections.unmodifiableMap(countWords(words));
-  }
 
   public Set<String> words(){
     return counts.keySet();
   }
 
-  public int getCount(String word){
+  public int get(String word){
     return counts.getOrDefault(word, 0);
   }
 
   public Map<String, Integer> getCounts() {
-    return counts;
+    return Collections.unmodifiableMap(counts);
+  }
+
+  public void add(String text){
+    String trimmedLine = text.trim();
+    if (!trimmedLine.isEmpty()) {
+      countWords(splitWords(trimmedLine));
+    }
+  }
+
+  public int size (){
+    return counts.size();
+  }
+
+  public int total(){
+    return totalWords;
   }
 
   String[] splitWords(String text) {
@@ -32,17 +44,11 @@ public final class WordCounter {
         .split("[\\W_]+");
   }
 
-  Map<String, Integer> countWords(String[] words) {
-    Map<String, Integer> counts = new HashMap<>();
+  void countWords(String[] words) {
     for (String word : words) {
-      if (!counts.containsKey(word)) {
-        counts.put(word, 1);
-      } else {
-        int previousCount = counts.get(word);
-        counts.put(word, previousCount + 1);
-      }
+     counts.put(word, get(word)+1);
+     totalWords++;
     }
-    return counts;
   }
 
   @Override
