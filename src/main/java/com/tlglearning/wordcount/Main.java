@@ -5,26 +5,51 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Comparator;
+import java.util.Map.Entry;
 
-public class Main {
+/**
+ * Demonstrates the practice word counting, used (for example) in authorship studies.
+ * This demonstration uses (in the included methods) implementations of the {@link java.util.Map},
+ * {@link java.util.Map.Entry}, and {@link java.util.stream.Stream}
+ */
+public final class Main {
+
 
   private static final String TEST_FILE_NAME = "hound-of-the-baskervilles.txt";
+  private Main(){
 
+  }
+
+  /**
+   * Creates an instance of {@link WordCounter}, using it to process the contents of "The Hound of the Baskervilles", by Arthur Conan Doyle.
+   * After processing, the word counts (excluding short words) are listed in descending order.
+   * <p>This method assumes that a text file named {@code hound-of-baskervilles.txt} is located on the classpath;
+   * otherwise( of if that file cannot be read for some reason), an instance of {@link IOException} is thrown</p>
+   * @param args command-line arguments (currently ignored).
+   * @throws IOException Thrown if input file cannot be located or read.
+   */
   public static void main(String[] args) throws IOException {
-      try(
-          InputStream input = Main.class.getClassLoader().getResourceAsStream(TEST_FILE_NAME);
-          Reader reader  = new InputStreamReader(input);
-          BufferedReader buffer = new BufferedReader(reader)
+    try (
+        InputStream input = Main.class.getClassLoader().getResourceAsStream(TEST_FILE_NAME);
+        Reader reader = new InputStreamReader(input);
+        BufferedReader buffer = new BufferedReader(reader)
 
-      ) {
-          WordCounter counter = new WordCounter();
-          String line;
-          while ((line = buffer.readLine()) != null ){
-            counter.add(line);
+    ) {
+      WordCounter counter = new WordCounter();
+      String line;
+      while ((line = buffer.readLine()) != null) {
+        counter.add(line);
 
-          }
-          System.out.println(counter);
       }
+      counter
+          .getCounts()
+          .entrySet()
+          .stream()
+          .sorted(Comparator.comparing(Entry<String, Integer>::getValue).reversed())
+          .limit(10)
+          .forEach(System.out::println);
+    }
   }
 
 }
